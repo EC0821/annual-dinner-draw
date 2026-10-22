@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Millennium Rewind - ANNUAL DINNER 2026 幸運大抽獎</title>
+    <style>
+        :root {
+            --bg-color: #0d0614;
+            --card-bg: rgba(25, 12, 40, 0.75);
+            --neon-pink: #ff2a8d;
+            --neon-cyan: #00f0ff;
+            --neon-gold: #ffd700;
+            --neon-purple: #9d4edd;
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(255, 42, 141, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 40%),
+                linear-gradient(to bottom, #07030a, #150a21);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 10px;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .company-name {
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            color: #d1d5db;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .main-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff 0%, #f0abfc 50%, var(--neon-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 42, 141, 0.6);
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .sub-title {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            letter-spacing: 3px;
+            margin-top: 5px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            font-weight: 700;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .wheel-section {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 360px;
+            height: 360px;
+            margin: 10px auto;
+        }
+
+        @media (min-width: 600px) {
+            .wheel-container {
+                width: 440px;
+                height: 440px;
+            }
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 42px;
+            z-index: 20;
+            filter: drop-shadow(0 0 8px var(--neon-pink));
+        }
+
+        .pointer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 16px solid transparent;
+            border-right: 16px solid transparent;
+            border-top: 36px solid var(--neon-pink);
+        }
+
+        .wheel-outer-ring {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            padding: 12px;
+            background: linear-gradient(135deg, #ff2a8d, #9d4edd, #00f0ff, #ff2a8d);
+            box-shadow: 
+                0 0 30px rgba(255, 42, 141, 0.5),
+                0 0 60px rgba(0, 240, 255, 0.3),
+                inset 0 0 15px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        canvas#wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 5s cubic-bezier(0.15, 0.85, 0.15, 0.98);
+        }
+
+        .center-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #2d124d 0%, #110522 100%);
+            border: 4px solid var(--neon-gold);
+            color: #fff;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 
+                0 0 15px var(--neon-gold),
+                inset 0 0 10px rgba(255, 215, 0, 0.5);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .center-button:hover:not(:disabled) {
+            transform: translate(-50%, -50%) scale(1.08);
+            box-shadow: 0 0 25px var(--neon-gold);
+        }
+
+        .center-button:disabled {
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .control-panel {
+            width: 100%;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 42, 141, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: rgba(15, 5, 25, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box .label {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--neon-cyan);
+        }
+
+        .btn-reset {
+            width: 100%;
+            padding: 12px;
+            background: rgba(40, 15, 60, 0.6);
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            color: #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-reset:hover {
+            background: rgba(157, 78, 221, 0.3);
+            border-color: var(--neon-purple);
+            color: #fff;
+        }
+
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .result-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1f0a33, #0d0317);
+            border: 2px solid var(--neon-pink);
+            box-shadow: 0 0 30px var(--neon-pink);
+            padding: 35px 25px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .result-modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 10px;
+        }
+
+        .prize-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+
+        .prize-title.grand {
+            color: var(--neon-gold);
+            text-shadow: 0 0 15px var(--neon-gold);
+        }
+
+        .prize-title.small {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .modal-btn {
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 42, 141, 0.5);
+        }
+
+        .history-section {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .history-title {
+            font-size: 0.95rem;
+            color: #a0aec0;
+            margin-bottom: 8px;
+        }
+
+        .history-list {
+            max-height: 120px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .tag-grand { color: var(--neon-gold); font-weight: bold; }
+        .tag-small { color: var(--neon-cyan); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="company-name">SWIRE PROPERTIES</div>
+        <div class="main-title">Millennium Rewind</div>
+        <div class="sub-title">ANNUAL DINNER 2026</div>
+    </header>
+
+    <div class="main-container">
+        <div class="wheel-section">
+            <div class="pointer"></div>
+            <div class="wheel-outer-ring">
+                <canvas id="wheel" width="500" height="500"></canvas>
+            </div>
+            <button id="spinBtn" class="center-button">SPIN</button>
+        </div>
+
+        <div class="control-panel">
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="label">大獎剩餘數量</div>
+                    <div id="grandCount" class="value" style="color: var(--neon-gold);">18 / 18</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">已抽總次數</div>
+                    <div id="totalDraws" class="value">0</div>
+                </div>
+            </div>
+
+            <button id="resetLogicBtn" class="btn-reset">
+                🔄 系統重置 (Reset System)
+            </button>
+
+            <div class="history-section">
+                <div class="history-title">最近抽籤紀錄</div>
+                <div id="historyList" class="history-list">
+                    <div style="color: #64748b; text-align: center; padding: 10px;">暫無抽籤紀錄</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 結果彈窗 -->
+    <div id="resultModal" class="result-modal">
+        <div class="modal-content">
+            <div class="modal-title">恭喜獲得</div>
+            <div id="prizeName" class="prize-title grand">大獎</div>
+            <button id="closeModal" class="modal-btn">確定</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const grandCountEl = document.getElementById('grandCount');
+        const totalDrawsEl = document.getElementById('totalDraws');
+        const resetLogicBtn = document.getElementById('resetLogicBtn');
+        const resultModal = document.getElementById('resultModal');
+        const prizeNameEl = document.getElementById('prizeName');
+        const closeModal = document.getElementById('closeModal');
+        const historyList = document.getElementById('historyList');
+
+        // 轉盤狀態變數
+        let grandPrizesLeft = 18;
+        let internalCounter = 0; // 內部連續抽取次數紀錄
+        let totalDraws = 0;
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        // 角度說明：
+        // 大獎占 30 度 (0 ~ 30 度)
+        // 小禮物占 330 度 (30 ~ 360 度)
+        const GRAND_ANGLE = 30;
+
+        function drawWheel() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const cx = width / 2;
+            const cy = height / 2;
+            const radius = width / 2 - 10;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. 小禮物扇區 (330度, 30° -> 360°)
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, radius, (30 * Math.PI) / 180, (360 * Math.PI) / 180);
+            ctx.closePath();
+            
+            const smallGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, radius);
+            smallGrad.addColorStop(0, '#1a0b2e');
+            smallGrad.addColorStop(1, '#090314');
+            ctx.fillStyle = smallGrad;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#00f0ff';
+            ctx.stroke();
+
+            // 繪製小禮物文字
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate((195 * Math.PI) / 180); // 30 ~ 360 中間角度 195度
+            ctx.fillStyle = '#00f0ff';
+            ctx.font = 'bold 26px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = '#00f0ff';
+            ctx.shadowBlur = 10;
+            ctx.fillText('小禮物', radius * 0.6, 0);
+            ctx.restore();
+
+            // 2. 大獎扇區 (30度, 0° -> 30°)
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.arc(cx, cy, radius, 0, (30 * Math.PI) / 180);
+            ctx.closePath();
+            
+            const grandGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, radius);
+            grandGrad.addColorStop(0, '#ff2a8d');
+            grandGrad.addColorStop(1, '#ffd700');
+            ctx.fillStyle = grandGrad;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = '#ffd700';
+            ctx.stroke();
+
+            // 繪製大獎文字
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate((15 * Math.PI) / 180); // 0 ~ 30 中間角度 15度
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 22px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = '#000000';
+            ctx.shadowBlur = 5;
+            ctx.fillText('★ 大獎 ★', radius * 0.65, 0);
+            ctx.restore();
+
+            // 扇區分隔線
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + radius * Math.cos(0), cy + radius * Math.sin(0));
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + radius * Math.cos((30 * Math.PI) / 180), cy + radius * Math.sin((30 * Math.PI) / 180));
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        drawWheel();
+
+        // 旋轉抽籤邏輯
+        spinBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+
+            internalCounter++;
+            totalDraws++;
+            
+            let isGrandPrize = false;
+
+            // 機制：連續抽完 8 次小禮物，第 9 次必中大獎
+            if (internalCounter === 9 && grandPrizesLeft > 0) {
+                isGrandPrize = true;
+            }
+
+            isSpinning = true;
+            spinBtn.disabled = true;
+
+            // 計算目標停留角度 (指標在頂部 -90 度位置)
+            let targetDegree = 0;
+
+            if (isGrandPrize) {
+                // 停在大獎扇區 (0 ~ 30度，安全邊界取 5 ~ 25度)
+                const randomAngle = 5 + Math.random() * 20; 
+                targetDegree = 360 - randomAngle - 90;
+            } else {
+                // 停在小禮物扇區 (30 ~ 360度，安全邊界取 35 ~ 355度)
+                const randomAngle = 35 + Math.random() * 320; 
+                targetDegree = 360 - randomAngle - 90;
+            }
+
+            // 基礎旋轉圈數 (至少轉 5 圈)
+            const extraRounds = 360 * 6;
+            const finalRotation = currentRotation + extraRounds + ((targetDegree - (currentRotation % 360) + 360) % 360);
+            
+            currentRotation = finalRotation;
+            canvas.style.transform = `rotate(${finalRotation}deg)`;
+
+            // 旋轉動畫結束後處理
+            setTimeout(() => {
+                isSpinning = false;
+                spinBtn.disabled = false;
+                
+                if (isGrandPrize) {
+                    grandPrizesLeft--;
+                    internalCounter = 0; // 保底觸發後歸零
+                    showResult('大獎', true);
+                } else {
+                    showResult('小禮物', false);
+                }
+
+                updateUI();
+                addHistory(isGrandPrize ? '大獎' : '小禮物', isGrandPrize);
+
+            }, 5000);
+        });
+
+        function updateUI() {
+            grandCountEl.textContent = `${grandPrizesLeft} / 18`;
+            totalDrawsEl.textContent = totalDraws;
+        }
+
+        function showResult(prizeText, isGrand) {
+            prizeNameEl.textContent = prizeText;
+            prizeNameEl.className = `prize-title ${isGrand ? 'grand' : 'small'}`;
+            resultModal.classList.add('show');
+        }
+
+        closeModal.addEventListener('click', () => {
+            resultModal.classList.remove('show');
+        });
+
+        // 重置內部計數器
+        resetLogicBtn.addEventListener('click', () => {
+            internalCounter = 0;
+            alert('系統狀態已重置。');
+        });
+
+        function addHistory(prizeText, isGrand) {
+            if (totalDraws === 1) {
+                historyList.innerHTML = '';
+            }
+            const time = new Date().toLocaleTimeString('zh-HK', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <span>${time} (第 ${totalDraws} 次)</span>
+                <span class="${isGrand ? 'tag-grand' : 'tag-small'}">${prizeText}</span>
+            `;
+            historyList.insertBefore(item, historyList.firstChild);
+        }
+    </script>
+</body>
+</html>
